@@ -1,0 +1,22 @@
+# spark-streaming-ml/Dockerfile.train
+
+FROM bitnami/spark:3.5.0
+
+USER root
+# Java, setuptools ve numpy kurulumu
+RUN apt-get update \
+ && apt-get install -y default-jdk \
+ && pip3 install --no-cache-dir setuptools numpy \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Eğitim script’i ve veri
+COPY train_offline.py .
+COPY DailyDelhiClimateTrain.csv .
+
+# Model klasörünü önden oluştur
+RUN mkdir model
+
+# Spark ile offline eğitim
+CMD ["spark-submit", "--master", "local[*]", "train_offline.py"]

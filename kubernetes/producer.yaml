@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer-deployment-last
+  namespace: my-app-namespace
+  labels:
+    app: producer-last
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: producer-last
+  template:
+    metadata:
+      labels:
+        app: producer-last
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: minikube-m02
+      containers:
+      - name: producer
+        image: kayaozkan/producer-deployment-last:v1
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: KAFKA_BROKER
+          value: "kafka:9092"
+        - name: KAFKA_TOPIC
+          value: "projectv1"
+        - name: DATA_PATH
+          value: "DailyDelhiClimateTest.csv"
+        - name: CHUNK_SIZE
+          value: "10"
+        - name: DELAY
+          value: "1"
+        resources:
+          requests:
+            cpu:    "200m"
+            memory: "256Mi"
+          limits:
+            cpu:    "200m"
+            memory: "256Mi"

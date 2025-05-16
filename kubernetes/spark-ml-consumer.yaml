@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-ml-consumer-last
+  namespace: my-app-namespace
+  labels:
+    app: spark-ml-consumer-last
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-ml-consumer-last
+  template:
+    metadata:
+      labels:
+        app: spark-ml-consumer-last
+    spec:
+      # İsteğe bağlı: belirli bir node’a sabitlemek isterseniz açın
+      # nodeSelector:
+      #   kubernetes.io/hostname: minikube-m02
+
+      containers:
+      - name: spark-ml-consumer
+        image: kayaozkan/spark-ml-consumer-last:v2
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: KAFKA_BROKER
+          value: "kafka:9092"
+        - name: KAFKA_TOPIC
+          value: "projectv1"
+        - name: CHECKPOINT_LOCATION
+          value: "file:///tmp/spark-checkpoint"
+        - name: MODEL_PATH
+          value: "/app/model"
+        - name: SPARK_CLASSPATH
+          value: "/app/jars/*"
+        resources:
+          requests:
+            cpu:    "500m"
+            memory: "1Gi"
+          limits:
+            cpu:    "1"
+            memory: "2Gi"
+        volumeMounts:
+        - name: spark-checkpoint
+          mountPath: /tmp/spark-checkpoint
+
+      volumes:
+      - name: spark-checkpoint
+        emptyDir: {}

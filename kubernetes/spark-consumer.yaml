@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer-deployment-last
+  namespace: my-app-namespace
+  labels:
+    app: consumer-last
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer-last
+  template:
+    metadata:
+      labels:
+        app: consumer-last
+    spec:
+      # consumer’ı worker3 üzerinde çalıştır
+      nodeSelector:
+        kubernetes.io/hostname: minikube-m03
+      containers:
+      - name: consumer
+        image: kayaozkan/consumer-deployment-last:v1
+        imagePullPolicy: IfNotPresent
+        # Dockerfile içinde ENV ile zaten KAFKA_BROKER, KAFKA_TOPIC, GROUP_ID tanımlı
+        resources:
+          requests:
+            cpu:    "200m"
+            memory: "256Mi"
+          limits:
+            cpu:    "200m"
+            memory: "256Mi"
